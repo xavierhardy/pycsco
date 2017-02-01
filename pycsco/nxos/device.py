@@ -108,7 +108,7 @@ class Device():
         self.sw1.set_out_format(fmat)
         self.sw1.set_cmd(command)
 
-        data = self.sw1.send_req()
+        data = self.sw1.send_req(fmat=fmat)
 
         if fmat == 'xml':
             data_dict = xmltodict.parse(data[1])
@@ -126,7 +126,7 @@ class Device():
         self.sw1.set_out_format(fmat)
         self.sw1.set_cmd(command)
 
-        data = self.sw1.send_req()
+        data = self.sw1.send_req(fmat=fmat)
         # return self.sw1.send_req
         if fmat == 'xml':
             data_dict = xmltodict.parse(data[1])

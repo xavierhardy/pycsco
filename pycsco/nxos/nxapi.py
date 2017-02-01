@@ -15,6 +15,12 @@ except ImportError as e:
     print '***************************'
 
 
+FORMAT_TO_CONTENT_TYPE = {
+    "xml": "text/xml",
+    "json": "application/json"
+}
+
+
 class HTTPSConnection(HTTPConnection):
 
     '''This class allows communication via SSL.'''
@@ -118,6 +124,7 @@ class RespFetcher:
         username='admin',
         password='insieme',
         url='http://172.21.128.227/ins',
+        content_type=None
     ):
 
         self.username = username
@@ -125,6 +132,7 @@ class RespFetcher:
         self.url = url
         self.base64_str = base64.encodestring('%s:%s' % (username,
                                               password)).replace('\n', '')
+        self.content_type = content_type
 
     def get_resp(
         self,
@@ -136,6 +144,8 @@ class RespFetcher:
         req = urllib2.Request(self.url, req_str)
         req.add_header('Authorization', 'Basic %s' % self.base64_str)
         req.add_header('Cookie', '%s' % cookie)
+        if self.content_type is not None:
+            req.add_header('Content-Type', self.content_type)
         try:
             with contextlib.closing(urllib2.urlopen(req,
                                     timeout=timeout)) as resp:
@@ -282,6 +292,14 @@ class NXAPI:
         req_msg += '</ins_api>\n'
         return req_msg
 
-    def send_req(self):
-        req = RespFetcher(self.username, self.password, self.target_url)
+    def send_req(self, fmat="xml"):
+        if fmat is not None:
+            content_type = FORMAT_TO_CONTENT_TYPE.get(fmat)
+        else:
+            content_type = None
+
+        req = RespFetcher(
+            self.username, self.password, self.target_url,
+            content_type=content_type
+        )
         return req.get_resp(self.req_to_string(), self.cookie, self.timeout)
