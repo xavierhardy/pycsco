@@ -1,10 +1,5 @@
-try:
-    import xmltodict
-    import re
-except ImportError as e:
-    print '*' * 30
-    print e
-    print '*' * 30
+import xmltodict
+import re
 
 __all__ = ['get_aaa_server_info', 'config_aaa_server',
            'default_aaa_server', 'get_aaa_host_info',

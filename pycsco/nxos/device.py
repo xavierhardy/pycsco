@@ -14,18 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-try:
-    import xmltodict
-    import os.path
-    import yaml
-    import json
-    from os.path import expanduser
-    from nxapi import NXAPI
-    from error import CLIError
-except ImportError as e:
-    print '***************************'
-    print e
-    print '***************************'
+import json
+import os.path
+from os.path import expanduser
+
+import xmltodict
+import yaml
+
+from pycsco.nxos.error import CLIError
+from pycsco.nxos.nxapi import NXAPI
 
 
 class Auth():
@@ -110,10 +107,14 @@ class Device():
 
         data = self.sw1.send_req()
 
+        raw_data = data[1]
+        if isinstance(raw_data, bytes):
+            raw_data = raw_data.decode('utf8')
+
         if fmat == 'xml':
-            data_dict = xmltodict.parse(data[1])
+            data_dict = xmltodict.parse(raw_data)
         elif fmat == 'json':
-            data_dict = json.loads(data[1])
+            data_dict = json.loads(raw_data)
 
         clierror = self.cli_error_check(data_dict)
         if clierror:
@@ -127,11 +128,15 @@ class Device():
         self.sw1.set_cmd(command)
 
         data = self.sw1.send_req()
-        # return self.sw1.send_req
+
+        raw_data = data[1]
+        if isinstance(raw_data, bytes):
+            raw_data = raw_data.decode('utf8')
+
         if fmat == 'xml':
-            data_dict = xmltodict.parse(data[1])
+            data_dict = xmltodict.parse(raw_data)
         elif fmat == 'json':
-            data_dict = json.loads(data[1])
+            data_dict = json.loads(raw_data)
 
         clierror = self.cli_error_check(data_dict)
         if clierror:

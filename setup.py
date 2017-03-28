@@ -14,6 +14,7 @@ setup(
       'xmltodict>=0.9.2',
       'gtextfsm==0.2.1',
       'scp',
-      'paramiko'
+      'paramiko',
+      'pyyaml==3.12'
   ],
 )
