@@ -19,12 +19,7 @@ from pycsco.nxos.utils import legacy
 
 import json
 
-try:
-    import xmltodict
-except ImportError as e:
-    print '*' * 30
-    print e
-    print '*' * 30
+import xmltodict
 
 __all__ = []
 

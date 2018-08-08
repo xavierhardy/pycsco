@@ -24,13 +24,8 @@ is to make this more object oriented, efficient, and optimal for support
 Ansible modules and in addition, general development.
 
 """
-try:
-    import xmltodict
-    from pycsco.nxos.device import Device
-except ImportError as e:
-    print '*' * 30
-    print e
-    print '*' * 30
+import xmltodict
+from pycsco.nxos.device import Device
 
 __all__ = []
 

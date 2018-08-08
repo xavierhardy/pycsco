@@ -15,15 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pycsco.nxos.utils import legacy
-from pycsco.nxos.error import CLIError
+import xmltodict
 
-try:
-    import xmltodict
-except ImportError as e:
-    print '*' * 30
-    print e
-    print '*' * 30
+from pycsco.nxos.error import CLIError
+from pycsco.nxos.utils import legacy
 
 __all__ = ['get_igmp_defaults', 'get_igmp_global', 'get_igmp_snooping',
            'get_igmp_snooping_defaults', 'get_igmp_interface',

@@ -15,15 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-try:
-    import xmltodict
-    import collections
-    from pycsco.nxos.error import CLIError
-    from pycsco.nxos.utils import legacy
-except ImportError as e:
-    print '*' * 30
-    print e
-    print '*' * 30
+import xmltodict
+import collections
+from pycsco.nxos.error import CLIError
+from pycsco.nxos.utils import legacy
 
 __all__ = []
 

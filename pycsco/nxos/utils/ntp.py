@@ -1,10 +1,5 @@
-try:
-    import xmltodict
-    from pycsco.nxos.utils import legacy
-except ImportError as e:
-    print '*' * 30
-    print e
-    print '*' * 30
+import xmltodict
+from pycsco.nxos.utils import legacy
 
 __all__ = ['get_ntp_existing', 'config_ntp', 'disable_ntp_server_peer',
            'get_ntp_auth_info', 'set_ntp_auth_key', 'remove_ntp_auth_key',

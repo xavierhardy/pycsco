@@ -1,18 +1,22 @@
 #!/usr/bin/env python
 # Copyright (C) 2013 Cisco Systems Inc.
 # All rights reserved
-try:
-    import urllib2
-    import contextlib
-    import base64
-    import socket
-    import httplib
+import base64
+import contextlib
+import socket
+import ssl
+from sys import version_info
+
+PY3 = version_info >= (3, )
+
+if PY3:
+    # Python 3
+    from urllib.request import urlopen, Request
+    from http.client import HTTPConnection, HTTPS_PORT
+else:
+    # Python 2
+    from urllib2 import urlopen, Request
     from httplib import HTTPConnection, HTTPS_PORT
-    import ssl
-except ImportError as e:
-    print '***************************'
-    print e
-    print '***************************'
 
 
 FORMAT_TO_CONTENT_TYPE = {
@@ -73,7 +77,10 @@ class HTTPSConnection(HTTPConnection):
 # line below. The entire HTTPSConnection class should be removed sometime in
 # the future. // jonas@stenling.se
 #
-#httplib.HTTPSConnection = HTTPSConnection
+# if PY3:
+#     http.client.HTTPSConnection = HTTPSConnection
+# else:
+#     httplib.HTTPSConnection = HTTPSConnection
 
 
 class RequestMsg:
@@ -130,9 +137,18 @@ class RespFetcher:
         self.username = username
         self.password = password
         self.url = url
-        self.base64_str = base64.encodestring('%s:%s' % (username,
-                                              password)).replace('\n', '')
         self.content_type = content_type
+
+        auth_str = '%s:%s' % (username, password)
+        if PY3:
+            auth_str = auth_str.encode('utf8')
+
+        base64_str = base64.b64encode(auth_str)
+
+        if PY3:
+            base64_str = base64_str.decode('utf8')
+
+        self.base64_str = base64_str.replace('\n', '')
 
     def get_resp(
         self,
@@ -141,19 +157,21 @@ class RespFetcher:
         timeout,
     ):
 
-        req = urllib2.Request(self.url, req_str)
+        if PY3:
+            req_str = req_str.encode('utf8')
+
+        req = Request(self.url, req_str)
         req.add_header('Authorization', 'Basic %s' % self.base64_str)
         req.add_header('Cookie', '%s' % cookie)
         if self.content_type is not None:
             req.add_header('Content-Type', self.content_type)
         try:
-            with contextlib.closing(urllib2.urlopen(req,
-                                    timeout=timeout)) as resp:
+            with contextlib.closing(urlopen(req, timeout=timeout)) as resp:
                 resp_str = resp.read()
                 resp_headers = resp.info()
                 return (resp_headers, resp_str)
-        except socket.timeout, e:
-            print 'Req timeout'
+        except socket.timeout as e:
+            print('Req timeout')
             raise
 
 
@@ -179,17 +197,19 @@ class RespFetcherHttps:
         timeout,
     ):
 
-        req = urllib2.Request(self.url, req_str)
+        if PY3:
+            req_str = req_str.encode('utf8')
+
+        req = Request(self.url, req_str)
         req.add_header('Authorization', 'Basic %s' % self.base64_str)
         req.add_header('Cookie', '%s' % cookie)
         try:
-            with contextlib.closing(urllib2.urlopen(req,
-                                    timeout=timeout)) as resp:
+            with contextlib.closing(urlopen(req, timeout=timeout)) as resp:
                 resp_str = resp.read()
                 resp_headers = resp.info()
                 return (resp_headers, resp_str)
-        except socket.timeout, e:
-            print 'Req timeout'
+        except socket.timeout as e:
+            print('Req timeout')
             raise
 
 

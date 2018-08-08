@@ -24,14 +24,9 @@ is to make this more object oriented, efficient, and optimal for support
 Ansible modules and in addition, general development.
 
 """
-try:
-    import xmltodict
-    import re
-    from pycsco.nxos.error import CLIError
-except ImportError as e:
-    print '*' * 30
-    print e
-    print '*' * 30
+import xmltodict
+import re
+from pycsco.nxos.error import CLIError
 
 __all__ = ['cmd_list_to_string', 'create_dir', 'feature_enabled',
            'get_active_vpc_peer_link', 'get_interface_running_config',
