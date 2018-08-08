@@ -41,51 +41,64 @@ def get_vrrp_existing(device, interface):
         dict: k/v pairs in the form of interface/[group list]
 
     """
-    command = 'show vrrp detail interface ' + interface
+    command = "show vrrp detail interface " + interface
     xmlReturnData = device.show(command)
     result = xmltodict.parse(xmlReturnData[1])
     vrrp = []
     try:
-        get_data = result['ins_api']['outputs']['output']['body'].get(
-            'TABLE_vrrp_group')
+        get_data = result["ins_api"]["outputs"]["output"]["body"].get(
+            "TABLE_vrrp_group"
+        )
         # ['ROW_vrrp_group']
 
         # print type(get_data[0])
         # print get_data[0]['ROW_vrrp_group']
         try:
             for entry in get_data:
-                get_dict = entry['ROW_vrrp_group']
-                group = get_dict.get('sh_group_id')
-                vip = get_dict.get('sh_vip_addr')
-                priority = get_dict.get('sh_priority')
-                preempt = get_dict.get('sh_group_preempt')
-                auth = get_dict.get('sh_auth_text')
-                interval = get_dict.get('sh_adv_interval')
+                get_dict = entry["ROW_vrrp_group"]
+                group = get_dict.get("sh_group_id")
+                vip = get_dict.get("sh_vip_addr")
+                priority = get_dict.get("sh_priority")
+                preempt = get_dict.get("sh_group_preempt")
+                auth = get_dict.get("sh_auth_text")
+                interval = get_dict.get("sh_adv_interval")
 
-                if preempt == 'Disable':
+                if preempt == "Disable":
                     preempt = False
-                elif preempt == 'Enable':
+                elif preempt == "Enable":
                     preempt = True
 
-                temp = dict(group=group, vip=vip, priority=priority,
-                            preempt=preempt, auth=auth, interval=interval)
+                temp = dict(
+                    group=group,
+                    vip=vip,
+                    priority=priority,
+                    preempt=preempt,
+                    auth=auth,
+                    interval=interval,
+                )
                 vrrp.append(temp)
 
         except TypeError:
-            get_dict = get_data['ROW_vrrp_group']
+            get_dict = get_data["ROW_vrrp_group"]
 
-            group = get_dict.get('sh_group_id')
-            vip = get_dict.get('sh_vip_addr')
-            priority = get_dict.get('sh_priority')
-            preempt = get_dict.get('sh_group_preempt')
-            auth = get_dict.get('sh_auth_text')
-            interval = get_dict.get('sh_adv_interval')
-            if preempt == 'Disable':
+            group = get_dict.get("sh_group_id")
+            vip = get_dict.get("sh_vip_addr")
+            priority = get_dict.get("sh_priority")
+            preempt = get_dict.get("sh_group_preempt")
+            auth = get_dict.get("sh_auth_text")
+            interval = get_dict.get("sh_adv_interval")
+            if preempt == "Disable":
                 preempt = False
-            elif preempt == 'Enable':
+            elif preempt == "Enable":
                 preempt = True
-            temp = dict(group=group, vip=vip, priority=priority,
-                        preempt=preempt, auth=auth, interval=interval)
+            temp = dict(
+                group=group,
+                vip=vip,
+                priority=priority,
+                preempt=preempt,
+                auth=auth,
+                interval=interval,
+            )
             vrrp.append(temp)
 
     except (KeyError, AttributeError):
@@ -108,31 +121,31 @@ def get_commands_config_vrrp(delta):
     commands = []
 
     CMDS = {
-        'priority': 'priority {0}',
-        'preempt': 'preempt',
-        'vip': 'address {0}',
-        'interval': 'advertisement-interval {0}',
-        'auth': 'authentication text {0}'
+        "priority": "priority {0}",
+        "preempt": "preempt",
+        "vip": "address {0}",
+        "interval": "advertisement-interval {0}",
+        "auth": "authentication text {0}",
     }
 
-    vip = delta.get('vip')
-    prio = delta.get('priority')
-    preempt = delta.get('preempt')
-    interval = delta.get('interval')
-    auth = delta.get('auth')
+    vip = delta.get("vip")
+    prio = delta.get("priority")
+    preempt = delta.get("preempt")
+    interval = delta.get("interval")
+    auth = delta.get("auth")
 
     if vip:
-        commands.append((CMDS.get('vip')).format(vip))
+        commands.append((CMDS.get("vip")).format(vip))
     if prio:
-        commands.append((CMDS.get('priority')).format(prio))
+        commands.append((CMDS.get("priority")).format(prio))
     if preempt:
-        commands.append(CMDS.get('preempt'))
+        commands.append(CMDS.get("preempt"))
     elif preempt is False:
-        commands.append('no ' + CMDS.get('preempt'))
+        commands.append("no " + CMDS.get("preempt"))
     if interval:
-        commands.append((CMDS.get('interval')).format(interval))
+        commands.append((CMDS.get("interval")).format(interval))
     if auth:
-        commands.append((CMDS.get('auth')).format(auth))
+        commands.append((CMDS.get("auth")).format(auth))
 
     return commands
 
@@ -143,7 +156,7 @@ def get_existing_vrrp(device, interface, group):
     existing = {}
     if existing_groups:
         for specific_group in existing_groups:
-            if specific_group.get('group') == group:
+            if specific_group.get("group") == group:
                 existing = specific_group
 
     return existing
@@ -163,17 +176,19 @@ def get_commands_remove_vrrp(group):
 
     """
     commands = []
-    commands.append('no vrrp ' + group)
+    commands.append("no vrrp " + group)
     return commands
 
 
 if __name__ == "__main__":
 
-    device = Device(ip='n9396-2', username='cisco',
-                    password='!cisco123!', protocol='http')
+    device = Device(
+        ip="n9396-2", username="cisco", password="!cisco123!", protocol="http"
+    )
 
-    interface = 'vlan100'
+    interface = "vlan100"
     test = get_vrrp_existing(device, interface)
 
     import json
+
     print(json.dumps(test, indent=4))

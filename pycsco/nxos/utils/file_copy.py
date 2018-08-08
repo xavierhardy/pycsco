@@ -11,6 +11,7 @@ import re
 class FileCopy(object):
     """This class is used to copy local files to a NXOS device.
     """
+
     def __init__(self, device, src, dst=None, port=22):
         self.device = device
         self.src = src
@@ -20,10 +21,10 @@ class FileCopy(object):
     def get_flash_size(self):
         """Return the available space in the remote directory.
         """
-        dir_out_dict = xmltodict.parse(self.device.show('dir', text=True)[1])
-        dir_out = dir_out_dict['ins_api']['outputs']['output']['body']
+        dir_out_dict = xmltodict.parse(self.device.show("dir", text=True)[1])
+        dir_out = dir_out_dict["ins_api"]["outputs"]["output"]["body"]
 
-        match = re.search(r'(\d+) bytes free', dir_out)
+        match = re.search(r"(\d+) bytes free", dir_out)
         bytes_free = match.group(1)
 
         return int(bytes_free)
@@ -65,10 +66,11 @@ class FileCopy(object):
         return self.file_already_exists()
 
     def remote_file_exists(self):
-        dir_dict = xmltodict.parse(self.device.show(
-            'dir {0}'.format(self.dst), text=True)[1])
-        dir_body = dir_dict['ins_api']['outputs']['output']['body']
-        if 'No such file' in dir_body:
+        dir_dict = xmltodict.parse(
+            self.device.show("dir {0}".format(self.dst), text=True)[1]
+        )
+        dir_body = dir_dict["ins_api"]["outputs"]["output"]["body"]
+        if "No such file" in dir_body:
             return False
 
         return True
@@ -77,13 +79,16 @@ class FileCopy(object):
         """Return the md5 sum of the remote file,
         if it exists.
         """
-        md5_dict = xmltodict.parse(self.device.show(
-            'show file {0} md5sum'.format(self.dst), text=False)[1])
-        md5_body = md5_dict['ins_api']['outputs']['output']['body']
+        md5_dict = xmltodict.parse(
+            self.device.show(
+                "show file {0} md5sum".format(self.dst), text=False
+            )[1]
+        )
+        md5_body = md5_dict["ins_api"]["outputs"]["output"]["body"]
         if md5_body:
-            return md5_body['file_content_md5sum']
+            return md5_body["file_content_md5sum"]
 
-    def get_local_md5(self, blocksize=2**20):
+    def get_local_md5(self, blocksize=2 ** 20):
         """Get the md5 sum of the local file,
         if it exists.
         """
@@ -96,7 +101,9 @@ class FileCopy(object):
                     buf = f.read(blocksize)
             return m.hexdigest()
 
-    def transfer_file(self, hostname=None, username=None, password=None, pull=False):
+    def transfer_file(
+        self, hostname=None, username=None, password=None, pull=False
+    ):
         """Transfer the file to the remote device over SCP.
 
         Note:
@@ -120,11 +127,13 @@ class FileCopy(object):
         if pull is False:
             if not self.local_file_exists():
                 raise FileTransferError(
-                    'Could not transfer file. Local file doesn\'t exist.')
+                    "Could not transfer file. Local file doesn't exist."
+                )
 
             if not self.enough_space():
                 raise FileTransferError(
-                    'Could not transfer file. Not enough space on device.')
+                    "Could not transfer file. Not enough space on device."
+                )
 
         hostname = hostname or self.device.ip
         username = username or self.device.username
@@ -138,7 +147,8 @@ class FileCopy(object):
             password=password,
             port=self.port,
             allow_agent=False,
-            look_for_keys=False)
+            look_for_keys=False,
+        )
 
         scp = SCPClient(ssh.get_transport())
         try:
@@ -146,9 +156,10 @@ class FileCopy(object):
                 scp.get(self.dst, self.src)
             else:
                 scp.put(self.src, self.dst)
-        except:
+        except Exception:
             raise FileTransferError(
-                'Could not transfer file. There was an error during transfer.')
+                "Could not transfer file. There was an error during transfer."
+            )
         finally:
             scp.close()
 

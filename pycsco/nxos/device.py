@@ -25,34 +25,35 @@ from pycsco.nxos.error import CLIError
 from pycsco.nxos.nxapi import NXAPI
 
 
-class Auth():
+class Auth:
     def __init__(self, vendor, model):
-        home = expanduser('~')
+        home = expanduser("~")
         self.username = None
         self.password = None
-        creds_file = home + '/.netauth'
+        creds_file = home + "/.netauth"
         if os.path.isfile(creds_file):
-            with open(creds_file, 'r') as creds:
+            with open(creds_file, "r") as creds:
                 auth = yaml.load(creds)
             try:
-                self.username = auth[vendor][model]['username']
-                self.password = auth[vendor][model]['password']
-            except:
+                self.username = auth[vendor][model]["username"]
+                self.password = auth[vendor][model]["password"]
+            except Exception:
                 pass
 
 
-class Device():
+class Device:
+    def __init__(
+        self,
+        username="cisco",
+        password="cisco",
+        ip="192.168.200.50",
+        protocol="http",
+        port=None,
+        timeout=30,
+    ):
 
-    def __init__(self,
-                 username='cisco',
-                 password='cisco',
-                 ip='192.168.200.50',
-                 protocol='http',
-                 port=None,
-                 timeout=30):
-
-        if protocol not in ('http', 'https'):
-            raise ValueError('protocol must be http or https')
+        if protocol not in ("http", "https"):
+            raise ValueError("protocol must be http or https")
 
         self.username = username
         self.password = password
@@ -62,11 +63,11 @@ class Device():
         self.port = port
         self.sw1 = NXAPI()
         if self.port is not None:
-            self.sw1.set_target_url('%s://%s:%s/ins' % (self.protocol,
-                                                        self.ip, self.port))
+            self.sw1.set_target_url(
+                "%s://%s:%s/ins" % (self.protocol, self.ip, self.port)
+            )
         else:
-            self.sw1.set_target_url('%s://%s/ins' % (self.protocol,
-                                                     self.ip))
+            self.sw1.set_target_url("%s://%s/ins" % (self.protocol, self.ip))
 
         self.sw1.set_username(self.username)
         self.sw1.set_password(self.password)
@@ -80,27 +81,27 @@ class Device():
         clierror = None
         msg = None
         has_clierror = False
-        error_check_list = data_dict['ins_api']['outputs']['output']
+        error_check_list = data_dict["ins_api"]["outputs"]["output"]
 
         try:
             for index, each in enumerate(error_check_list):
-                clierror = each.get('clierror', None)
-                msg = each.get('msg', None)
-                if 'clierror' in each:
+                clierror = each.get("clierror", None)
+                msg = each.get("msg", None)
+                if "clierror" in each:
                     has_clierror = True
         except AttributeError:
-            clierror = error_check_list.get('clierror', None)
-            msg = error_check_list.get('msg', None)
-            has_clierror = 'clierror' in error_check_list
+            clierror = error_check_list.get("clierror", None)
+            msg = error_check_list.get("msg", None)
+            has_clierror = "clierror" in error_check_list
 
         if clierror or has_clierror:
             return CLIError(clierror, msg, index)
 
-    def show(self, command, fmat='xml', text=False):
+    def show(self, command, fmat="xml", text=False):
         if text is False:
-            self.sw1.set_msg_type('cli_show')
+            self.sw1.set_msg_type("cli_show")
         elif text:
-            self.sw1.set_msg_type('cli_show_ascii')
+            self.sw1.set_msg_type("cli_show_ascii")
 
         self.sw1.set_out_format(fmat)
         self.sw1.set_cmd(command)
@@ -109,11 +110,11 @@ class Device():
 
         raw_data = data[1]
         if isinstance(raw_data, bytes):
-            raw_data = raw_data.decode('utf8')
+            raw_data = raw_data.decode("utf8")
 
-        if fmat == 'xml':
+        if fmat == "xml":
             data_dict = xmltodict.parse(raw_data)
-        elif fmat == 'json':
+        elif fmat == "json":
             data_dict = json.loads(raw_data)
 
         clierror = self.cli_error_check(data_dict)
@@ -122,8 +123,8 @@ class Device():
 
         return data
 
-    def config(self, command, fmat='xml'):
-        self.sw1.set_msg_type('cli_conf')
+    def config(self, command, fmat="xml"):
+        self.sw1.set_msg_type("cli_conf")
         self.sw1.set_out_format(fmat)
         self.sw1.set_cmd(command)
 
@@ -131,11 +132,11 @@ class Device():
 
         raw_data = data[1]
         if isinstance(raw_data, bytes):
-            raw_data = raw_data.decode('utf8')
+            raw_data = raw_data.decode("utf8")
 
-        if fmat == 'xml':
+        if fmat == "xml":
             data_dict = xmltodict.parse(raw_data)
-        elif fmat == 'json':
+        elif fmat == "json":
             data_dict = json.loads(raw_data)
 
         clierror = self.cli_error_check(data_dict)

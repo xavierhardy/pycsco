@@ -17,6 +17,7 @@
 import os
 import textfsm
 
+
 def get_structured_data(template, rawtxt):
     """Returns structured data given raw text using
     TextFSM templates
@@ -25,7 +26,11 @@ def get_structured_data(template, rawtxt):
     # return os.getcwd()
     # return os.path.abspath(__file__)
 
-    path = os.path.dirname(os.path.abspath(__file__)) + '/textfsm_templates/' + template
+    path = (
+        os.path.dirname(os.path.abspath(__file__))
+        + "/textfsm_templates/"
+        + template
+    )
     fsm = textfsm.TextFSM(open(path))
 
     # an object is what is being extracted
