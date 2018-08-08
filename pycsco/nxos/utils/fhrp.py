@@ -176,4 +176,4 @@ if __name__ == "__main__":
     test = get_vrrp_existing(device, interface)
 
     import json
-    print json.dumps(test, indent=4)
+    print(json.dumps(test, indent=4))

@@ -103,13 +103,13 @@ def get_acl(device, acl_name, seq_number):
                 options['time_range'] = each.get('timerange')
 
                 options_no_null = {}
-                for k, v in options.iteritems():
+                for k, v in options.items():
                     if v is not None:
                         options_no_null[k] = v
 
                 keep['options'] = options_no_null
 
-            for k, v in temp.iteritems():
+            for k, v in temp.items():
                 if v:
                     keep[k] = v
 
@@ -161,13 +161,13 @@ def get_acl(device, acl_name, seq_number):
             options['time_range'] = each.get('timerange')
 
             options_no_null = {}
-            for k, v in options.iteritems():
+            for k, v in options.items():
                 if v:
                     options_no_null[k] = v
 
             keep['options'] = options_no_null
 
-        for k, v in temp.iteritems():
+        for k, v in temp.items():
             if v:
                 keep[k] = v
 
@@ -259,7 +259,7 @@ def config_acl_options(options):
         options.pop('time_range')
 
     command = ''
-    for option, value in options.iteritems():
+    for option, value in options.items():
         if option in ENABLE_ONLY:
             if value == 'enable':
                 command += ' ' + option
@@ -388,7 +388,7 @@ if __name__ == "__main__":
     seq_number = '40'
 
     data = get_acl_interface(device, 'MYACL')
-    print json.dumps(data, indent=4)
+    print(json.dumps(data, indent=4))
     # print json.dumps(ace, indent=4)
 
     '''

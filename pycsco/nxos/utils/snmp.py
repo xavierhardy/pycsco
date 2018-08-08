@@ -81,7 +81,7 @@ def config_snmp_community(delta, community):
         'acl': 'snmp-server community {0} use-acl {acl}'
     }
     commands = []
-    for k, v in delta.iteritems():
+    for k, v in delta.items():
         cmd = CMDS.get(k).format(community, **delta)
         if cmd:
             commands.append(cmd)
@@ -381,7 +381,7 @@ def config_snmp_host(delta, proposed, existing):
         'src_intf': 'snmp-server host {0} source-interface {src_intf}'
     }
 
-    for key, value in delta.iteritems():
+    for key, value in delta.items():
         if key in ['vrf_filter', 'vrf', 'udp', 'src_intf']:
             command = CMDS.get(key, None)
             if command:
